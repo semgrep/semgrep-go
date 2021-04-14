@@ -1,0 +1,34 @@
+File: semgrep-grammars/src/tree-sitter-go/LICENSE
+Git repo name: ocaml-tree-sitter
+Last git commit:
+  commit dadfd9c9aab2630632e61cfce645c13c35aa092f
+  Merge: cc39bc5 05a6666
+  Author: Douglas Creager <dcreager@dcreager.net>
+  Date:   Tue Oct 27 13:42:16 2020 -0400
+  
+      Merge pull request #38 from tree-sitter/rust-package
+      
+      Add Rust package
+---
+File: semgrep-grammars/src/tree-sitter-go/grammar.js
+Git repo name: ocaml-tree-sitter
+Last git commit:
+  commit dadfd9c9aab2630632e61cfce645c13c35aa092f
+  Merge: cc39bc5 05a6666
+  Author: Douglas Creager <dcreager@dcreager.net>
+  Date:   Tue Oct 27 13:42:16 2020 -0400
+  
+      Merge pull request #38 from tree-sitter/rust-package
+      
+      Add Rust package
+---
+File: semgrep-grammars/src/semgrep-go/grammar.js
+Git repo name: ocaml-tree-sitter
+Last git commit:
+  commit 9bca49eafc8489bc0d508057079bec9b7d10f65e
+  Author: Martin Jambon <martin@returntocorp.com>
+  Date:   Wed Apr 14 16:44:28 2021 -0700
+  
+      Include new file 'fyi/versions' that tracks git info associated with
+      each file in the "FYI" list.
+---
