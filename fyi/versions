@@ -1,33 +1,32 @@
 File: semgrep-grammars/src/tree-sitter-go/LICENSE
-Git repo name: ocaml-tree-sitter
-Last git commit:
-  commit dadfd9c9aab2630632e61cfce645c13c35aa092f
-  Merge: cc39bc5 05a6666
-  Author: Douglas Creager <dcreager@dcreager.net>
-  Date:   Tue Oct 27 13:42:16 2020 -0400
+Git repo name: tree-sitter-go
+Latest commit in repo: dadfd9c9aab2630632e61cfce645c13c35aa092f
+Last change in file:
+  commit d29ad53a4310a943880ae40c7050f8562bf84f33
+  Author: Max Brunsfeld <maxbrunsfeld@gmail.com>
+  Date:   Tue Aug 16 21:02:37 2016 -0700
   
-      Merge pull request #38 from tree-sitter/rust-package
-      
-      Add Rust package
+      Start on top-level constructs, const declarations
 ---
 File: semgrep-grammars/src/tree-sitter-go/grammar.js
-Git repo name: ocaml-tree-sitter
-Last git commit:
-  commit dadfd9c9aab2630632e61cfce645c13c35aa092f
-  Merge: cc39bc5 05a6666
-  Author: Douglas Creager <dcreager@dcreager.net>
-  Date:   Tue Oct 27 13:42:16 2020 -0400
+Git repo name: tree-sitter-go
+Latest commit in repo: dadfd9c9aab2630632e61cfce645c13c35aa092f
+Last change in file:
+  commit b0c78230146705e867034e49a5ece20245b33490
+  Author: Max Brunsfeld <maxbrunsfeld@gmail.com>
+  Date:   Thu Jul 9 14:39:54 2020 -0700
   
-      Merge pull request #38 from tree-sitter/rust-package
+      Allow statements at the top level
       
-      Add Rust package
+      This improves parsing of code snippets, as often appear in markdown readmes
 ---
 File: semgrep-grammars/src/semgrep-go/grammar.js
 Git repo name: ocaml-tree-sitter
-Last git commit:
-  commit b1b6d3e7595b5368f61588db168fea32774b3f81
+Latest commit in repo: f0469e1b59ee4df9d8cdded2a7d5cb124f3ea264
+Last change in file:
+  commit 9b59bf4de55a94ebfeae44ad37b628ef1e2dd8c8
   Author: Martin Jambon <martin@returntocorp.com>
-  Date:   Wed Apr 14 16:59:53 2021 -0700
+  Date:   Wed Feb 17 16:49:53 2021 -0800
   
-      Add release file containing the tree-sitter version
+      Modernize/fix setup for go
 ---
