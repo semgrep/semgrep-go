@@ -8,10 +8,10 @@
 open! Sexplib.Conv
 open Tree_sitter_run
 
-type identifier = Token.t
+type imaginary_literal = Token.t
 [@@deriving sexp_of]
 
-type raw_string_literal = Token.t
+type float_literal = Token.t
 [@@deriving sexp_of]
 
 type anon_choice_LF_249c99f = [
@@ -20,25 +20,22 @@ type anon_choice_LF_249c99f = [
 ]
 [@@deriving sexp_of]
 
-type int_literal = Token.t
-[@@deriving sexp_of]
-
 type anon_choice_new_0342769 = [
     `New of Token.t (* "new" *)
   | `Make of Token.t (* "make" *)
 ]
 [@@deriving sexp_of]
 
-type float_literal = Token.t
-[@@deriving sexp_of]
-
-type imm_tok_pat_101b4f2 = Token.t (* pattern "[^\"\\n\\\\]+" *)
+type identifier = Token.t
 [@@deriving sexp_of]
 
 type rune_literal = Token.t
 [@@deriving sexp_of]
 
-type escape_sequence = Token.t
+type raw_string_literal = Token.t
+[@@deriving sexp_of]
+
+type int_literal = Token.t
 [@@deriving sexp_of]
 
 type anon_choice_EQ_4ccabd6 = [
@@ -47,7 +44,11 @@ type anon_choice_EQ_4ccabd6 = [
 ]
 [@@deriving sexp_of]
 
-type imaginary_literal = Token.t
+type escape_sequence = Token.t
+[@@deriving sexp_of]
+
+type interpreted_string_literal_basic_content =
+  Token.t (* pattern "[^\"\\n\\\\]+" *)
 [@@deriving sexp_of]
 
 type field_name_list = (
@@ -56,12 +57,15 @@ type field_name_list = (
 )
 [@@deriving sexp_of]
 
+type empty_labeled_statement = (identifier (*tok*) * Token.t (* ":" *))
+[@@deriving sexp_of]
+
+type constraint_term = (Token.t (* "~" *) option * identifier (*tok*))
+[@@deriving sexp_of]
+
 type qualified_type = (
     identifier (*tok*) * Token.t (* "." *) * identifier (*tok*)
 )
-[@@deriving sexp_of]
-
-type empty_labeled_statement = (identifier (*tok*) * Token.t (* ":" *))
 [@@deriving sexp_of]
 
 type string_literal = [
@@ -69,12 +73,19 @@ type string_literal = [
   | `Inte_str_lit of (
         Token.t (* "\"" *)
       * [
-            `Imm_tok_pat_101b4f2 of imm_tok_pat_101b4f2 (*tok*)
+            `Inte_str_lit_basic_content of
+              interpreted_string_literal_basic_content (*tok*)
           | `Esc_seq of escape_sequence (*tok*)
         ]
           list (* zero or more *)
       * Token.t (* "\"" *)
     )
+]
+[@@deriving sexp_of]
+
+type interface_type_name = [
+    `Id of identifier (*tok*)
+  | `Qual_type of qualified_type
 ]
 [@@deriving sexp_of]
 
@@ -106,18 +117,8 @@ and anon_choice_exp_047b57a = [
   | `Vari_arg of (expression * Token.t (* "..." *))
 ]
 
-and anon_choice_field_id_ccb7464 = [
-    `Id of identifier (*tok*)
-  | `Qual_type of qualified_type
-  | `Meth_spec of (
-        identifier (*tok*)
-      * parameter_list
-      * anon_choice_param_list_29faba4 option
-    )
-]
-
 and anon_choice_param_decl_18823e5 = [
-    `Param_decl of (field_name_list option * type_)
+    `Param_decl of parameter_declaration
   | `Vari_param_decl of (
         identifier (*tok*) option
       * Token.t (* "..." *)
@@ -189,7 +190,11 @@ and call_expression = [
     `Choice_new_spec_arg_list of (
         anon_choice_new_0342769 * special_argument_list
     )
-  | `Exp_arg_list of (expression * argument_list)
+  | `Exp_opt_type_args_arg_list of (
+        expression
+      * type_arguments option
+      * argument_list
+    )
 ]
 
 and channel_type = [
@@ -323,6 +328,7 @@ and expression = [
           | `Impl_len_array_type of implicit_length_array_type
           | `Struct_type of struct_type
           | `Id of identifier (*tok*)
+          | `Gene_type of generic_type
           | `Qual_type of qualified_type
         ]
       * literal_value
@@ -341,6 +347,7 @@ and expression = [
   | `Nil of Token.t (* "nil" *)
   | `True of Token.t (* "true" *)
   | `False of Token.t (* "false" *)
+  | `Iota of Token.t (* "iota" *)
   | `Paren_exp of (Token.t (* "(" *) * expression * Token.t (* ")" *))
 ]
 
@@ -365,7 +372,7 @@ and field_declaration = (
         )
       | `Opt_STAR_choice_id of (
             Token.t (* "*" *) option
-          * [ `Id of identifier (*tok*) | `Qual_type of qualified_type ]
+          * interface_type_name
         )
     ]
   * string_literal option
@@ -390,6 +397,8 @@ and for_clause = (
   * simple_statement option
 )
 
+and generic_type = (identifier (*tok*) * type_arguments)
+
 and if_statement = (
     Token.t (* "if" *)
   * (simple_statement * Token.t (* ";" *)) option
@@ -402,6 +411,19 @@ and if_statement = (
 and implicit_length_array_type = (
     Token.t (* "[" *) * Token.t (* "..." *) * Token.t (* "]" *) * type_
 )
+
+and interface_body = [
+    `Meth_spec of (
+        identifier (*tok*)
+      * parameter_list
+      * anon_choice_param_list_29faba4 option
+    )
+  | `Inte_type_name of interface_type_name
+  | `Cons_elem of (
+        constraint_term
+      * (Token.t (* "|" *) * constraint_term) list (* zero or more *)
+    )
+]
 
 and literal_value = (
     Token.t (* "{" *)
@@ -420,17 +442,7 @@ and map_type = (
   * type_
 )
 
-and method_spec_list = (
-    Token.t (* "{" *)
-  * (
-        anon_choice_field_id_ccb7464
-      * (anon_choice_LF_249c99f * anon_choice_field_id_ccb7464)
-          list (* zero or more *)
-      * anon_choice_LF_249c99f option
-    )
-      option
-  * Token.t (* "}" *)
-)
+and parameter_declaration = (field_name_list option * type_)
 
 and parameter_list = (
     Token.t (* "(" *)
@@ -490,10 +502,21 @@ and simple_statement = [
 
 and simple_type = [
     `Id of identifier (*tok*)
+  | `Gene_type of generic_type
   | `Qual_type of qualified_type
   | `Poin_type of (Token.t (* "*" *) * type_)
   | `Struct_type of struct_type
-  | `Inte_type of (Token.t (* "interface" *) * method_spec_list)
+  | `Inte_type of (
+        Token.t (* "interface" *)
+      * Token.t (* "{" *)
+      * (
+            interface_body
+          * (anon_choice_LF_249c99f * interface_body) list (* zero or more *)
+          * anon_choice_LF_249c99f option
+        )
+          option
+      * Token.t (* "}" *)
+    )
   | `Array_type of array_type
   | `Slice_type of slice_type
   | `Map_type of map_type
@@ -583,6 +606,14 @@ and type_ = [
 
 and type_alias = (identifier (*tok*) * Token.t (* "=" *) * type_)
 
+and type_arguments = (
+    Token.t (* "[" *)
+  * type_
+  * (Token.t (* "," *) * type_) list (* zero or more *)
+  * Token.t (* "," *) option
+  * Token.t (* "]" *)
+)
+
 and type_case = (
     Token.t (* "case" *)
   * type_
@@ -591,7 +622,15 @@ and type_case = (
   * statement_list option
 )
 
-and type_spec = (identifier (*tok*) * type_)
+and type_parameter_list = (
+    Token.t (* "[" *)
+  * parameter_declaration
+  * (Token.t (* "," *) * parameter_declaration) list (* zero or more *)
+  * Token.t (* "," *) option
+  * Token.t (* "]" *)
+)
+
+and type_spec = (identifier (*tok*) * type_parameter_list option * type_)
 
 and type_switch_header = (
     (simple_statement * Token.t (* ";" *)) option
@@ -628,6 +667,7 @@ type top_level_declaration = [
   | `Func_decl of (
         Token.t (* "func" *)
       * identifier (*tok*)
+      * type_parameter_list option
       * parameter_list
       * anon_choice_param_list_29faba4 option
       * block option
@@ -667,25 +707,25 @@ type nil (* inlined *) = Token.t (* "nil" *)
 type blank_identifier (* inlined *) = Token.t (* "_" *)
 [@@deriving sexp_of]
 
-type true_ (* inlined *) = Token.t (* "true" *)
-[@@deriving sexp_of]
-
-type comment (* inlined *) = Token.t
-[@@deriving sexp_of]
-
-type empty_statement (* inlined *) = Token.t (* ";" *)
+type iota (* inlined *) = Token.t (* "iota" *)
 [@@deriving sexp_of]
 
 type fallthrough_statement (* inlined *) = Token.t (* "fallthrough" *)
 [@@deriving sexp_of]
 
+type comment (* inlined *) = Token.t
+[@@deriving sexp_of]
+
 type false_ (* inlined *) = Token.t (* "false" *)
+[@@deriving sexp_of]
+
+type true_ (* inlined *) = Token.t (* "true" *)
 [@@deriving sexp_of]
 
 type dot (* inlined *) = Token.t (* "." *)
 [@@deriving sexp_of]
 
-type package_identifier (* inlined *) = identifier (*tok*)
+type empty_statement (* inlined *) = Token.t (* ";" *)
 [@@deriving sexp_of]
 
 type field_identifier (* inlined *) = identifier (*tok*)
@@ -694,19 +734,18 @@ type field_identifier (* inlined *) = identifier (*tok*)
 type type_identifier (* inlined *) = identifier (*tok*)
 [@@deriving sexp_of]
 
+type package_identifier (* inlined *) = identifier (*tok*)
+[@@deriving sexp_of]
+
 type interpreted_string_literal (* inlined *) = (
     Token.t (* "\"" *)
   * [
-        `Imm_tok_pat_101b4f2 of imm_tok_pat_101b4f2 (*tok*)
+        `Inte_str_lit_basic_content of
+          interpreted_string_literal_basic_content (*tok*)
       | `Esc_seq of escape_sequence (*tok*)
     ]
       list (* zero or more *)
   * Token.t (* "\"" *)
-)
-[@@deriving sexp_of]
-
-type goto_statement (* inlined *) = (
-    Token.t (* "goto" *) * identifier (*tok*)
 )
 [@@deriving sexp_of]
 
@@ -716,14 +755,25 @@ type break_statement (* inlined *) = (
 )
 [@@deriving sexp_of]
 
+type package_clause (* inlined *) = (
+    Token.t (* "package" *) * identifier (*tok*)
+)
+[@@deriving sexp_of]
+
 type continue_statement (* inlined *) = (
     Token.t (* "continue" *)
   * identifier (*tok*) option
 )
 [@@deriving sexp_of]
 
-type package_clause (* inlined *) = (
-    Token.t (* "package" *) * identifier (*tok*)
+type goto_statement (* inlined *) = (
+    Token.t (* "goto" *) * identifier (*tok*)
+)
+[@@deriving sexp_of]
+
+type constraint_elem (* inlined *) = (
+    constraint_term
+  * (Token.t (* "|" *) * constraint_term) list (* zero or more *)
 )
 [@@deriving sexp_of]
 
@@ -755,6 +805,7 @@ type composite_literal (* inlined *) = (
       | `Impl_len_array_type of implicit_length_array_type
       | `Struct_type of struct_type
       | `Id of identifier (*tok*)
+      | `Gene_type of generic_type
       | `Qual_type of qualified_type
     ]
   * literal_value
@@ -830,7 +881,15 @@ type index_expression (* inlined *) = (
 [@@deriving sexp_of]
 
 type interface_type (* inlined *) = (
-    Token.t (* "interface" *) * method_spec_list
+    Token.t (* "interface" *)
+  * Token.t (* "{" *)
+  * (
+        interface_body
+      * (anon_choice_LF_249c99f * interface_body) list (* zero or more *)
+      * anon_choice_LF_249c99f option
+    )
+      option
+  * Token.t (* "}" *)
 )
 [@@deriving sexp_of]
 
@@ -854,9 +913,6 @@ type method_spec (* inlined *) = (
   * parameter_list
   * anon_choice_param_list_29faba4 option
 )
-[@@deriving sexp_of]
-
-type parameter_declaration (* inlined *) = (field_name_list option * type_)
 [@@deriving sexp_of]
 
 type parenthesized_expression (* inlined *) = (
@@ -1001,6 +1057,7 @@ type variadic_parameter_declaration (* inlined *) = (
 type function_declaration (* inlined *) = (
     Token.t (* "func" *)
   * identifier (*tok*)
+  * type_parameter_list option
   * parameter_list
   * anon_choice_param_list_29faba4 option
   * block option
