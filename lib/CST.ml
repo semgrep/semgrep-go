@@ -8,9 +8,6 @@
 open! Sexplib.Conv
 open Tree_sitter_run
 
-type imaginary_literal = Token.t
-[@@deriving sexp_of]
-
 type float_literal = Token.t
 [@@deriving sexp_of]
 
@@ -29,13 +26,19 @@ type anon_choice_new_0342769 = [
 type identifier = Token.t
 [@@deriving sexp_of]
 
-type rune_literal = Token.t
-[@@deriving sexp_of]
-
 type raw_string_literal = Token.t
 [@@deriving sexp_of]
 
 type int_literal = Token.t
+[@@deriving sexp_of]
+
+type escape_sequence = Token.t
+[@@deriving sexp_of]
+
+type imaginary_literal = Token.t
+[@@deriving sexp_of]
+
+type rune_literal = Token.t
 [@@deriving sexp_of]
 
 type anon_choice_EQ_4ccabd6 = [
@@ -44,23 +47,20 @@ type anon_choice_EQ_4ccabd6 = [
 ]
 [@@deriving sexp_of]
 
-type escape_sequence = Token.t
-[@@deriving sexp_of]
-
 type interpreted_string_literal_basic_content =
   Token.t (* pattern "[^\"\\n\\\\]+" *)
+[@@deriving sexp_of]
+
+type constraint_term = (Token.t (* "~" *) option * identifier (*tok*))
+[@@deriving sexp_of]
+
+type empty_labeled_statement = (identifier (*tok*) * Token.t (* ":" *))
 [@@deriving sexp_of]
 
 type field_name_list = (
     identifier (*tok*)
   * (Token.t (* "," *) * identifier (*tok*)) list (* zero or more *)
 )
-[@@deriving sexp_of]
-
-type empty_labeled_statement = (identifier (*tok*) * Token.t (* ":" *))
-[@@deriving sexp_of]
-
-type constraint_term = (Token.t (* "~" *) option * identifier (*tok*))
 [@@deriving sexp_of]
 
 type qualified_type = (
@@ -701,9 +701,6 @@ type source_file =
     list (* zero or more *)
 [@@deriving sexp_of]
 
-type nil (* inlined *) = Token.t (* "nil" *)
-[@@deriving sexp_of]
-
 type blank_identifier (* inlined *) = Token.t (* "_" *)
 [@@deriving sexp_of]
 
@@ -713,10 +710,16 @@ type iota (* inlined *) = Token.t (* "iota" *)
 type fallthrough_statement (* inlined *) = Token.t (* "fallthrough" *)
 [@@deriving sexp_of]
 
-type comment (* inlined *) = Token.t
+type false_ (* inlined *) = Token.t (* "false" *)
 [@@deriving sexp_of]
 
-type false_ (* inlined *) = Token.t (* "false" *)
+type empty_statement (* inlined *) = Token.t (* ";" *)
+[@@deriving sexp_of]
+
+type nil (* inlined *) = Token.t (* "nil" *)
+[@@deriving sexp_of]
+
+type comment (* inlined *) = Token.t
 [@@deriving sexp_of]
 
 type true_ (* inlined *) = Token.t (* "true" *)
@@ -725,16 +728,13 @@ type true_ (* inlined *) = Token.t (* "true" *)
 type dot (* inlined *) = Token.t (* "." *)
 [@@deriving sexp_of]
 
-type empty_statement (* inlined *) = Token.t (* ";" *)
-[@@deriving sexp_of]
-
 type field_identifier (* inlined *) = identifier (*tok*)
 [@@deriving sexp_of]
 
-type type_identifier (* inlined *) = identifier (*tok*)
+type package_identifier (* inlined *) = identifier (*tok*)
 [@@deriving sexp_of]
 
-type package_identifier (* inlined *) = identifier (*tok*)
+type type_identifier (* inlined *) = identifier (*tok*)
 [@@deriving sexp_of]
 
 type interpreted_string_literal (* inlined *) = (
@@ -749,6 +749,12 @@ type interpreted_string_literal (* inlined *) = (
 )
 [@@deriving sexp_of]
 
+type continue_statement (* inlined *) = (
+    Token.t (* "continue" *)
+  * identifier (*tok*) option
+)
+[@@deriving sexp_of]
+
 type break_statement (* inlined *) = (
     Token.t (* "break" *)
   * identifier (*tok*) option
@@ -757,12 +763,6 @@ type break_statement (* inlined *) = (
 
 type package_clause (* inlined *) = (
     Token.t (* "package" *) * identifier (*tok*)
-)
-[@@deriving sexp_of]
-
-type continue_statement (* inlined *) = (
-    Token.t (* "continue" *)
-  * identifier (*tok*) option
 )
 [@@deriving sexp_of]
 
@@ -1054,20 +1054,20 @@ type variadic_parameter_declaration (* inlined *) = (
 )
 [@@deriving sexp_of]
 
-type function_declaration (* inlined *) = (
+type method_declaration (* inlined *) = (
     Token.t (* "func" *)
+  * parameter_list
   * identifier (*tok*)
-  * type_parameter_list option
   * parameter_list
   * anon_choice_param_list_29faba4 option
   * block option
 )
 [@@deriving sexp_of]
 
-type method_declaration (* inlined *) = (
+type function_declaration (* inlined *) = (
     Token.t (* "func" *)
-  * parameter_list
   * identifier (*tok*)
+  * type_parameter_list option
   * parameter_list
   * anon_choice_param_list_29faba4 option
   * block option

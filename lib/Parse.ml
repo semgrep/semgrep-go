@@ -34,21 +34,35 @@ let extras = [
 
 let children_regexps : (string * Run.exp option) list = [
   "identifier", None;
-  "imaginary_literal", None;
+  "float_literal", None;
+  "false", None;
   "blank_identifier", None;
   "int_literal", None;
-  "raw_string_literal", None;
-  "float_literal", None;
-  "iota", None;
   "interpreted_string_literal_basic_content", None;
-  "true", None;
-  "escape_sequence", None;
   "fallthrough_statement", None;
   "empty_statement", None;
-  "false", None;
+  "imaginary_literal", None;
+  "iota", None;
+  "true", None;
   "rune_literal", None;
+  "raw_string_literal", None;
+  "escape_sequence", None;
   "dot", None;
   "nil", None;
+  "package_clause",
+  Some (
+    Seq [
+      Token (Literal "package");
+      Token (Name "identifier");
+    ];
+  );
+  "empty_labeled_statement",
+  Some (
+    Seq [
+      Token (Name "identifier");
+      Token (Literal ":");
+    ];
+  );
   "qualified_type",
   Some (
     Seq [
@@ -64,22 +78,6 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Name "identifier");
     ];
   );
-  "constraint_term",
-  Some (
-    Seq [
-      Opt (
-        Token (Literal "~");
-      );
-      Token (Name "identifier");
-    ];
-  );
-  "package_clause",
-  Some (
-    Seq [
-      Token (Literal "package");
-      Token (Name "identifier");
-    ];
-  );
   "continue_statement",
   Some (
     Seq [
@@ -89,11 +87,13 @@ let children_regexps : (string * Run.exp option) list = [
       );
     ];
   );
-  "empty_labeled_statement",
+  "constraint_term",
   Some (
     Seq [
+      Opt (
+        Token (Literal "~");
+      );
       Token (Name "identifier");
-      Token (Literal ":");
     ];
   );
   "break_statement",
@@ -1404,12 +1404,14 @@ let children_regexps : (string * Run.exp option) list = [
       Token (Literal ")");
     ];
   );
-  "method_declaration",
+  "function_declaration",
   Some (
     Seq [
       Token (Literal "func");
-      Token (Name "parameter_list");
       Token (Name "identifier");
+      Opt (
+        Token (Name "type_parameter_list");
+      );
       Token (Name "parameter_list");
       Opt (
         Alt [|
@@ -1422,14 +1424,12 @@ let children_regexps : (string * Run.exp option) list = [
       );
     ];
   );
-  "function_declaration",
+  "method_declaration",
   Some (
     Seq [
       Token (Literal "func");
+      Token (Name "parameter_list");
       Token (Name "identifier");
-      Opt (
-        Token (Name "type_parameter_list");
-      );
       Token (Name "parameter_list");
       Opt (
         Alt [|
@@ -1487,7 +1487,12 @@ let trans_identifier ((kind, body) : mt) : CST.identifier =
   | Leaf v -> v
   | Children _ -> assert false
 
-let trans_imaginary_literal ((kind, body) : mt) : CST.imaginary_literal =
+let trans_float_literal ((kind, body) : mt) : CST.float_literal =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_false_ ((kind, body) : mt) : CST.false_ =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
@@ -1503,32 +1508,7 @@ let trans_int_literal ((kind, body) : mt) : CST.int_literal =
   | Children _ -> assert false
 
 
-let trans_raw_string_literal ((kind, body) : mt) : CST.raw_string_literal =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_float_literal ((kind, body) : mt) : CST.float_literal =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_iota ((kind, body) : mt) : CST.iota =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
 let trans_interpreted_string_literal_basic_content ((kind, body) : mt) : CST.interpreted_string_literal_basic_content =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_true_ ((kind, body) : mt) : CST.true_ =
-  match body with
-  | Leaf v -> v
-  | Children _ -> assert false
-
-let trans_escape_sequence ((kind, body) : mt) : CST.escape_sequence =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
@@ -1543,12 +1523,32 @@ let trans_empty_statement ((kind, body) : mt) : CST.empty_statement =
   | Leaf v -> v
   | Children _ -> assert false
 
-let trans_false_ ((kind, body) : mt) : CST.false_ =
+let trans_imaginary_literal ((kind, body) : mt) : CST.imaginary_literal =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_iota ((kind, body) : mt) : CST.iota =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_true_ ((kind, body) : mt) : CST.true_ =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
 
 let trans_rune_literal ((kind, body) : mt) : CST.rune_literal =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_raw_string_literal ((kind, body) : mt) : CST.raw_string_literal =
+  match body with
+  | Leaf v -> v
+  | Children _ -> assert false
+
+let trans_escape_sequence ((kind, body) : mt) : CST.escape_sequence =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
@@ -1562,6 +1562,35 @@ let trans_nil ((kind, body) : mt) : CST.nil =
   match body with
   | Leaf v -> v
   | Children _ -> assert false
+
+let trans_package_clause ((kind, body) : mt) : CST.package_clause =
+  match body with
+  | Children v ->
+      (match v with
+      | Seq [v0; v1] ->
+          (
+            Run.trans_token (Run.matcher_token v0),
+            trans_identifier (Run.matcher_token v1)
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
+
+
+let trans_empty_labeled_statement ((kind, body) : mt) : CST.empty_labeled_statement =
+  match body with
+  | Children v ->
+      (match v with
+      | Seq [v0; v1] ->
+          (
+            trans_identifier (Run.matcher_token v0),
+            Run.trans_token (Run.matcher_token v1)
+          )
+      | _ -> assert false
+      )
+  | Leaf _ -> assert false
+
 
 let trans_qualified_type ((kind, body) : mt) : CST.qualified_type =
   match body with
@@ -1591,36 +1620,6 @@ let trans_goto_statement ((kind, body) : mt) : CST.goto_statement =
   | Leaf _ -> assert false
 
 
-let trans_constraint_term ((kind, body) : mt) : CST.constraint_term =
-  match body with
-  | Children v ->
-      (match v with
-      | Seq [v0; v1] ->
-          (
-            Run.opt
-              (fun v -> Run.trans_token (Run.matcher_token v))
-              v0
-            ,
-            trans_identifier (Run.matcher_token v1)
-          )
-      | _ -> assert false
-      )
-  | Leaf _ -> assert false
-
-let trans_package_clause ((kind, body) : mt) : CST.package_clause =
-  match body with
-  | Children v ->
-      (match v with
-      | Seq [v0; v1] ->
-          (
-            Run.trans_token (Run.matcher_token v0),
-            trans_identifier (Run.matcher_token v1)
-          )
-      | _ -> assert false
-      )
-  | Leaf _ -> assert false
-
-
 let trans_continue_statement ((kind, body) : mt) : CST.continue_statement =
   match body with
   | Children v ->
@@ -1636,16 +1635,17 @@ let trans_continue_statement ((kind, body) : mt) : CST.continue_statement =
       )
   | Leaf _ -> assert false
 
-
-
-let trans_empty_labeled_statement ((kind, body) : mt) : CST.empty_labeled_statement =
+let trans_constraint_term ((kind, body) : mt) : CST.constraint_term =
   match body with
   | Children v ->
       (match v with
       | Seq [v0; v1] ->
           (
-            trans_identifier (Run.matcher_token v0),
-            Run.trans_token (Run.matcher_token v1)
+            Run.opt
+              (fun v -> Run.trans_token (Run.matcher_token v))
+              v0
+            ,
+            trans_identifier (Run.matcher_token v1)
           )
       | _ -> assert false
       )
@@ -4684,15 +4684,18 @@ let trans_import_spec_list ((kind, body) : mt) : CST.import_spec_list =
       )
   | Leaf _ -> assert false
 
-let trans_method_declaration ((kind, body) : mt) : CST.method_declaration =
+let trans_function_declaration ((kind, body) : mt) : CST.function_declaration =
   match body with
   | Children v ->
       (match v with
       | Seq [v0; v1; v2; v3; v4; v5] ->
           (
             Run.trans_token (Run.matcher_token v0),
-            trans_parameter_list (Run.matcher_token v1),
-            trans_identifier (Run.matcher_token v2),
+            trans_identifier (Run.matcher_token v1),
+            Run.opt
+              (fun v -> trans_type_parameter_list (Run.matcher_token v))
+              v2
+            ,
             trans_parameter_list (Run.matcher_token v3),
             Run.opt
               (fun v ->
@@ -4718,18 +4721,15 @@ let trans_method_declaration ((kind, body) : mt) : CST.method_declaration =
       )
   | Leaf _ -> assert false
 
-let trans_function_declaration ((kind, body) : mt) : CST.function_declaration =
+let trans_method_declaration ((kind, body) : mt) : CST.method_declaration =
   match body with
   | Children v ->
       (match v with
       | Seq [v0; v1; v2; v3; v4; v5] ->
           (
             Run.trans_token (Run.matcher_token v0),
-            trans_identifier (Run.matcher_token v1),
-            Run.opt
-              (fun v -> trans_type_parameter_list (Run.matcher_token v))
-              v2
-            ,
+            trans_parameter_list (Run.matcher_token v1),
+            trans_identifier (Run.matcher_token v2),
             trans_parameter_list (Run.matcher_token v3),
             Run.opt
               (fun v ->
