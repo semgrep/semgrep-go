@@ -1,6 +1,6 @@
 File: semgrep-grammars/src/tree-sitter-go/LICENSE
 Git repo name: tree-sitter-go
-Latest commit in repo: 07d722831382a043b16547b6d9202f3da07f3cb3
+Latest commit in repo: 05900faa3cdb5d2d8c8bd5e77ee698487e0a8611
 Last change in file:
   commit 42b1e657c3a394c01df51dd3eadc8b214274a73c
   Author: Yoann Padioleau <yoann.padioleau@gmail.com>
@@ -12,17 +12,17 @@ Last change in file:
 ---
 File: semgrep-grammars/src/tree-sitter-go/grammar.js
 Git repo name: tree-sitter-go
-Latest commit in repo: 07d722831382a043b16547b6d9202f3da07f3cb3
+Latest commit in repo: 05900faa3cdb5d2d8c8bd5e77ee698487e0a8611
 Last change in file:
-  commit e9e693780c647c46c37336af9a4b44d343a526f6
-  Author: Yoann Padioleau <yoann.padioleau@gmail.com>
-  Date:   Tue Mar 22 15:31:51 2022 +0100
+  commit 40f3750ede072258e41ff8094f266c277b8645b4
+  Author: kawaemon <me@kawaemon.dev>
+  Date:   Fri Oct 14 12:43:31 2022 +0900
   
-      Name intermediate rule for ocaml-tree-sitter
+      Allow GenericType to accept QualifiedType
 ---
 File: semgrep-grammars/src/semgrep-go/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: af20558b9478beb5228166b970088d94801f10c8
+Latest commit in repo: 029bdb55a6c8ca80f92c8446c952bf91f84a700f
 Last change in file:
   commit 9b59bf4de55a94ebfeae44ad37b628ef1e2dd8c8
   Author: Martin Jambon <martin@returntocorp.com>

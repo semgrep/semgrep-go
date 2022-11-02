@@ -100,21 +100,14 @@ type import_spec = (
 )
 [@@deriving sexp_of]
 
-type anon_choice_elem_c42cd9b = [
-    `Elem of element
-  | `Keyed_elem of (
-        [
-            `Exp_COLON of (expression * Token.t (* ":" *))
-          | `Lit_value_COLON of (literal_value * Token.t (* ":" *))
-          | `Id_COLON of empty_labeled_statement
-        ]
-      * element
-    )
-]
-
-and anon_choice_exp_047b57a = [
+type anon_choice_exp_047b57a = [
     `Exp of expression
   | `Vari_arg of (expression * Token.t (* "..." *))
+]
+
+and anon_choice_lit_elem_0952f3f = [
+    `Lit_elem of literal_element
+  | `Keyed_elem of (literal_element * Token.t (* ":" *) * literal_element)
 ]
 
 and anon_choice_param_decl_18823e5 = [
@@ -267,8 +260,6 @@ and default_case = (
   * statement_list option
 )
 
-and element = [ `Exp of expression | `Lit_value of literal_value ]
-
 and expression = [
     `Un_exp of (
         [
@@ -397,7 +388,7 @@ and for_clause = (
   * simple_statement option
 )
 
-and generic_type = (identifier (*tok*) * type_arguments)
+and generic_type = (interface_type_name * type_arguments)
 
 and if_statement = (
     Token.t (* "if" *)
@@ -423,14 +414,23 @@ and interface_body = [
         constraint_term
       * (Token.t (* "|" *) * constraint_term) list (* zero or more *)
     )
+  | `Struct_elem of (
+        struct_term
+      * (Token.t (* "|" *) * struct_term) list (* zero or more *)
+    )
 ]
+
+and literal_element = [ `Exp of expression | `Lit_value of literal_value ]
 
 and literal_value = (
     Token.t (* "{" *)
   * (
-        anon_choice_elem_c42cd9b
-      * (Token.t (* "," *) * anon_choice_elem_c42cd9b)
-          list (* zero or more *)
+        (
+            anon_choice_lit_elem_0952f3f
+          * (Token.t (* "," *) * anon_choice_lit_elem_0952f3f)
+              list (* zero or more *)
+        )
+          option
       * Token.t (* "," *) option
     )
       option
@@ -596,6 +596,11 @@ and statement_list = [
     )
   | `Empty_labe_stmt of empty_labeled_statement
 ]
+
+and struct_term = (
+    [ `TILDE of Token.t (* "~" *) | `STAR of Token.t (* "*" *) ] option
+  * struct_type
+)
 
 and struct_type = (Token.t (* "struct" *) * field_declaration_list)
 
@@ -894,12 +899,7 @@ type interface_type (* inlined *) = (
 [@@deriving sexp_of]
 
 type keyed_element (* inlined *) = (
-    [
-        `Exp_COLON of (expression * Token.t (* ":" *))
-      | `Lit_value_COLON of (literal_value * Token.t (* ":" *))
-      | `Id_COLON of empty_labeled_statement
-    ]
-  * element
+    literal_element * Token.t (* ":" *) * literal_element
 )
 [@@deriving sexp_of]
 
@@ -971,6 +971,12 @@ type slice_expression (* inlined *) = (
         )
     ]
   * Token.t (* "]" *)
+)
+[@@deriving sexp_of]
+
+type struct_elem (* inlined *) = (
+    struct_term
+  * (Token.t (* "|" *) * struct_term) list (* zero or more *)
 )
 [@@deriving sexp_of]
 

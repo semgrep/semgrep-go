@@ -103,6 +103,8 @@ module.exports = grammar({
 
   rules: {
     source_file: $ => repeat(choice(
+      // Unlike a Go compiler, we accept statements at top-level to enable
+      // parsing of partial code snippets in documentation (see #63).
       seq($._statement, terminator),
       seq($._top_level_declaration, optional(terminator)),
     )),
@@ -232,7 +234,7 @@ module.exports = grammar({
     ),
 
     parameter_declaration: $ => seq(
-      field('name', commaSep($.identifier)),
+      commaSep(field('name', $.identifier)),
       field('type', $._type)
     ),
 
@@ -293,7 +295,7 @@ module.exports = grammar({
     ),
 
     generic_type: $ => seq(
-      field('type', $._type_identifier),
+      field('type', choice($._type_identifier, $.qualified_type)),
       field('type_arguments', $.type_arguments),
     ),
 
@@ -344,7 +346,7 @@ module.exports = grammar({
     field_declaration: $ => seq(
       choice(
         seq(
-          field('name', commaSep1($._field_identifier)),
+          commaSep1(field('name', $._field_identifier)),
           field('type', $._type)
         ),
         seq(
@@ -370,7 +372,7 @@ module.exports = grammar({
     ),
 
     _interface_body: $ => choice(
-       $.method_spec, $.interface_type_name, $.constraint_elem
+       $.method_spec, $.interface_type_name, $.constraint_elem, $.struct_elem
     ),
 
     interface_type_name: $ => choice($._type_identifier, $.qualified_type),
@@ -383,6 +385,16 @@ module.exports = grammar({
     constraint_term: $ => prec(-1, seq(
       optional('~'),
       $._type_identifier,
+    )),
+
+    struct_elem: $ => seq(
+      $.struct_term,
+      repeat(seq('|', $.struct_term))
+    ),
+
+    struct_term: $ => prec(-1, seq(
+      optional(choice('~', '*')),
+      $.struct_type
     )),
 
     method_spec: $ => seq(
@@ -761,30 +773,21 @@ module.exports = grammar({
 
     literal_value: $ => seq(
       '{',
-      optional(seq(
-        choice($.element, $.keyed_element),
-        repeat(seq(',', choice($.element, $.keyed_element))),
-        optional(',')
-      )),
+      optional(
+	seq(
+	  commaSep(choice($.literal_element, $.keyed_element)),
+          optional(','))),
       '}'
     ),
 
-    keyed_element: $ => seq(
-      choice(
-        seq($._expression, ':'),
-        seq($.literal_value, ':'),
-        prec(1, seq($._field_identifier, ':'))
-      ),
-      choice(
-        $._expression,
-        $.literal_value
-      )
-    ),
+    literal_element: $ => choice($._expression, $.literal_value),
 
-    element: $ => choice(
-      $._expression,
-      $.literal_value
-    ),
+    // In T{k: v}, the key k may be:
+    // - any expression (when T is a map, slice or array),
+    // - a field identifier (when T is a struct), or
+    // - a literal_element (when T is an array).
+    // The first two cases cannot be distinguished without type information.
+    keyed_element: $ => seq($.literal_element, ':', $.literal_element),
 
     func_literal: $ => seq(
       'func',

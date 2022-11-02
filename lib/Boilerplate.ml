@@ -131,34 +131,23 @@ let map_import_spec (env : env) ((v1, v2) : CST.import_spec) =
   let v2 = map_string_literal env v2 in
   todo env (v1, v2)
 
-let rec map_anon_choice_elem_c42cd9b (env : env) (x : CST.anon_choice_elem_c42cd9b) =
-  (match x with
-  | `Elem x -> map_element env x
-  | `Keyed_elem (v1, v2) ->
-      let v1 =
-        (match v1 with
-        | `Exp_COLON (v1, v2) ->
-            let v1 = map_expression env v1 in
-            let v2 = (* ":" *) token env v2 in
-            todo env (v1, v2)
-        | `Lit_value_COLON (v1, v2) ->
-            let v1 = map_literal_value env v1 in
-            let v2 = (* ":" *) token env v2 in
-            todo env (v1, v2)
-        | `Id_COLON x -> map_empty_labeled_statement env x
-        )
-      in
-      let v2 = map_element env v2 in
-      todo env (v1, v2)
-  )
-
-and map_anon_choice_exp_047b57a (env : env) (x : CST.anon_choice_exp_047b57a) =
+let rec map_anon_choice_exp_047b57a (env : env) (x : CST.anon_choice_exp_047b57a) =
   (match x with
   | `Exp x -> map_expression env x
   | `Vari_arg (v1, v2) ->
       let v1 = map_expression env v1 in
       let v2 = (* "..." *) token env v2 in
       todo env (v1, v2)
+  )
+
+and map_anon_choice_lit_elem_0952f3f (env : env) (x : CST.anon_choice_lit_elem_0952f3f) =
+  (match x with
+  | `Lit_elem x -> map_literal_element env x
+  | `Keyed_elem (v1, v2, v3) ->
+      let v1 = map_literal_element env v1 in
+      let v2 = (* ":" *) token env v2 in
+      let v3 = map_literal_element env v3 in
+      todo env (v1, v2, v3)
   )
 
 and map_anon_choice_param_decl_18823e5 (env : env) (x : CST.anon_choice_param_decl_18823e5) =
@@ -429,12 +418,6 @@ and map_default_case (env : env) ((v1, v2, v3) : CST.default_case) =
   in
   todo env (v1, v2, v3)
 
-and map_element (env : env) (x : CST.element) =
-  (match x with
-  | `Exp x -> map_expression env x
-  | `Lit_value x -> map_literal_value env x
-  )
-
 and map_expression (env : env) (x : CST.expression) =
   (match x with
   | `Un_exp (v1, v2) ->
@@ -657,7 +640,7 @@ and map_for_clause (env : env) ((v1, v2, v3, v4, v5) : CST.for_clause) =
   todo env (v1, v2, v3, v4, v5)
 
 and map_generic_type (env : env) ((v1, v2) : CST.generic_type) =
-  let v1 = (* identifier *) token env v1 in
+  let v1 = map_interface_type_name env v1 in
   let v2 = map_type_arguments env v2 in
   todo env (v1, v2)
 
@@ -717,27 +700,49 @@ and map_interface_body (env : env) (x : CST.interface_body) =
         ) v2
       in
       todo env (v1, v2)
+  | `Struct_elem (v1, v2) ->
+      let v1 = map_struct_term env v1 in
+      let v2 =
+        List.map (fun (v1, v2) ->
+          let v1 = (* "|" *) token env v1 in
+          let v2 = map_struct_term env v2 in
+          todo env (v1, v2)
+        ) v2
+      in
+      todo env (v1, v2)
+  )
+
+and map_literal_element (env : env) (x : CST.literal_element) =
+  (match x with
+  | `Exp x -> map_expression env x
+  | `Lit_value x -> map_literal_value env x
   )
 
 and map_literal_value (env : env) ((v1, v2, v3) : CST.literal_value) =
   let v1 = (* "{" *) token env v1 in
   let v2 =
     (match v2 with
-    | Some (v1, v2, v3) ->
-        let v1 = map_anon_choice_elem_c42cd9b env v1 in
-        let v2 =
-          List.map (fun (v1, v2) ->
-            let v1 = (* "," *) token env v1 in
-            let v2 = map_anon_choice_elem_c42cd9b env v2 in
-            todo env (v1, v2)
-          ) v2
+    | Some (v1, v2) ->
+        let v1 =
+          (match v1 with
+          | Some (v1, v2) ->
+              let v1 = map_anon_choice_lit_elem_0952f3f env v1 in
+              let v2 =
+                List.map (fun (v1, v2) ->
+                  let v1 = (* "," *) token env v1 in
+                  let v2 = map_anon_choice_lit_elem_0952f3f env v2 in
+                  todo env (v1, v2)
+                ) v2
+              in
+              todo env (v1, v2)
+          | None -> todo env ())
         in
-        let v3 =
-          (match v3 with
+        let v2 =
+          (match v2 with
           | Some tok -> (* "," *) token env tok
           | None -> todo env ())
         in
-        todo env (v1, v2, v3)
+        todo env (v1, v2)
     | None -> todo env ())
   in
   let v3 = (* "}" *) token env v3 in
@@ -1077,6 +1082,19 @@ and map_statement_list (env : env) (x : CST.statement_list) =
       todo env (v1, v2, v3)
   | `Empty_labe_stmt x -> map_empty_labeled_statement env x
   )
+
+and map_struct_term (env : env) ((v1, v2) : CST.struct_term) =
+  let v1 =
+    (match v1 with
+    | Some x ->
+        (match x with
+        | `TILDE tok -> (* "~" *) token env tok
+        | `STAR tok -> (* "*" *) token env tok
+        )
+    | None -> todo env ())
+  in
+  let v2 = map_struct_type env v2 in
+  todo env (v1, v2)
 
 and map_struct_type (env : env) ((v1, v2) : CST.struct_type) =
   let v1 = (* "struct" *) token env v1 in
