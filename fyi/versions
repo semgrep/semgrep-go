@@ -2,13 +2,11 @@ File: semgrep-grammars/src/tree-sitter-go/LICENSE
 Git repo name: tree-sitter-go
 Latest commit in repo: 05900faa3cdb5d2d8c8bd5e77ee698487e0a8611
 Last change in file:
-  commit 42b1e657c3a394c01df51dd3eadc8b214274a73c
-  Author: Yoann Padioleau <yoann.padioleau@gmail.com>
-  Date:   Mon Aug 16 18:29:17 2021 +0200
+  commit d29ad53a4310a943880ae40c7050f8562bf84f33
+  Author: Max Brunsfeld <maxbrunsfeld@gmail.com>
+  Date:   Tue Aug 16 21:02:37 2016 -0700
   
-      Merge pull request #50 from msftenhanceprovenance/patch-1
-      
-      Update package.json to include the repository key
+      Start on top-level constructs, const declarations
 ---
 File: semgrep-grammars/src/tree-sitter-go/grammar.js
 Git repo name: tree-sitter-go
@@ -22,7 +20,7 @@ Last change in file:
 ---
 File: semgrep-grammars/src/semgrep-go/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 029bdb55a6c8ca80f92c8446c952bf91f84a700f
+Latest commit in repo: 68b148bcba94012bbe4d60df17cc91c2603551c8
 Last change in file:
   commit 9b59bf4de55a94ebfeae44ad37b628ef1e2dd8c8
   Author: Martin Jambon <martin@returntocorp.com>
