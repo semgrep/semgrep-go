@@ -985,3 +985,7 @@ type import_declaration (* inlined *) = (
     Token.t (* "import" *)
   * [ `Import_spec of import_spec | `Import_spec_list of import_spec_list ]
 )
+
+type extra = Comment of Loc.t * comment
+
+type extras = extra list
