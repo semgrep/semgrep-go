@@ -20,12 +20,14 @@ Last change in file:
 ---
 File: semgrep-grammars/src/semgrep-go/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: d3ccc175a3c93686487010d9c166bb26d18f124d
+Latest commit in repo: c96a9ece97cde74cfd7169d669d56ca2c3ad6f7e
 Last change in file:
-  commit d3ccc175a3c93686487010d9c166bb26d18f124d
+  commit c96a9ece97cde74cfd7169d669d56ca2c3ad6f7e
   Author: Martin Jambon <martin@mjambon.com>
-  Date:   Fri Sep 13 14:26:29 2024 -0700
+  Date:   Fri Sep 13 14:49:47 2024 -0700
   
-      Revert PR https://github.com/semgrep/ocaml-tree-sitter-semgrep/pull/505
-      because it's not ready to use in semgrep
+      Revert 2 recent semgrep-go commits by Brandon and Yosef because
+      the accompanying changes in semgrep are not ready.
+      We're reverting the contents of semgrep-go to
+      commit 9b59bf4de55a94ebfeae44ad37b628ef1e2dd8c8
 ---
