@@ -25,13 +25,16 @@ module.exports = grammar(base_grammar, {
     // The parser tries to wrap ellipsis with expression statements since we
     // list ellipsis as expressions and usually we use them in a statement
     // position (i.e `if(true) {...}`)
+/* TODO: restore when the semgrep integration is ready.
+   This undoes https://github.com/semgrep/ocaml-tree-sitter-semgrep/pull/505
+
     _statement: ($, previous) => choice(
       previous,
       prec(1,$.semgrep_ellipsis_metavar),
       prec(1,$.semgrep_deep_ellipsis),
       prec(1,$.semgrep_ellipsis)
     ),
- 
+*/
     _expression: ($, previous) => choice(
       previous,
       $.semgrep_ellipsis_metavar,

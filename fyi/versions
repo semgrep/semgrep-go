@@ -1,6 +1,6 @@
 File: semgrep-grammars/src/tree-sitter-go/LICENSE
 Git repo name: tree-sitter-go
-Latest commit in repo: 81a11f8252998ee6b98d59e6da91fc307491e53d
+Latest commit in repo: 05900faa3cdb5d2d8c8bd5e77ee698487e0a8611
 Last change in file:
   commit d29ad53a4310a943880ae40c7050f8562bf84f33
   Author: Max Brunsfeld <maxbrunsfeld@gmail.com>
@@ -10,29 +10,22 @@ Last change in file:
 ---
 File: semgrep-grammars/src/tree-sitter-go/grammar.js
 Git repo name: tree-sitter-go
-Latest commit in repo: 81a11f8252998ee6b98d59e6da91fc307491e53d
+Latest commit in repo: 05900faa3cdb5d2d8c8bd5e77ee698487e0a8611
 Last change in file:
-  commit e232d4b93bb2c9edd472be4a05f690c8896b805f
-  Author: Amaan Qureshi <amaan.qureshi@datadoghq.com>
-  Date:   Mon Aug 26 12:26:05 2024 -0400
+  commit 40f3750ede072258e41ff8094f266c277b8645b4
+  Author: kawaemon <me@kawaemon.dev>
+  Date:   Fri Oct 14 12:43:31 2022 +0900
   
-      fix: hide newline tokens
+      Allow GenericType to accept QualifiedType
 ---
 File: semgrep-grammars/src/semgrep-go/grammar.js
 Git repo name: ocaml-tree-sitter-semgrep
-Latest commit in repo: 62c59803ce966ac00210b5ed8aa163a926f7eaad
+Latest commit in repo: d3ccc175a3c93686487010d9c166bb26d18f124d
 Last change in file:
-  commit f8e538029a4a6a675c7084f26ed7fb6f37bac5be
-  Author: Yosef Alsuhaibani <72322110+yosefAlsuhaibani@users.noreply.github.com>
-  Date:   Mon Sep 9 13:20:52 2024 -0400
+  commit d3ccc175a3c93686487010d9c166bb26d18f124d
+  Author: Martin Jambon <martin@mjambon.com>
+  Date:   Fri Sep 13 14:26:29 2024 -0700
   
-      fix(go): bump tree-sitter parser for go to resolve bug (#505)
-      
-      * Bump go tree-sitter
-      
-      * Resolve expression statement conflict
-      
-      * reduce diff + add comment
-      
-      * reduce diff
+      Revert PR https://github.com/semgrep/ocaml-tree-sitter-semgrep/pull/505
+      because it's not ready to use in semgrep
 ---
